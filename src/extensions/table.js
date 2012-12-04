@@ -55,7 +55,7 @@
       return out;
     };
     trim = function(text) {
-      if (String.trim) {
+      if (String.prototype.trim) {
         return text.trim();
       }
       return text.replace(/^\s+|\s+$/g, '');

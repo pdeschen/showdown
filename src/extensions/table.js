@@ -15,10 +15,10 @@
 
 (function(){
   var table = function(converter) {
-    var tables = {}, style = 'text-align:left;', filter; 
+    var tables = {}, style = 'text-align:left;', filter, trim; 
     tables.th = function(header){
-      if (header.trim() === "") { return "";}
-      var id = header.trim().replace(/ /g, '_').toLowerCase();
+      if (trim(header) === "") { return "";}
+      var id = trim(header).replace(/ /g, '_').toLowerCase();
       return '<th id="' + id + '" style="'+style+'">' + header + '</th>';
     };
     tables.td = function(cell) {
@@ -54,26 +54,32 @@
       out += "</tr>\n";
       return out;
     };
+    trim = function(text) {
+      if (String.trim) {
+        return text.trim();
+      }
+      return text.replace(/^\s+|\s+$/g, '');
+    };
     filter = function(text) { 
       var i=0, lines = text.split('\n'), tbl = [], line, hs, rows, out = [];
       for (i; i<lines.length;i+=1) {
         line = lines[i];
         // looks like a table heading
-        if (line.trim().match(/^[|]{1}.*[|]{1}$/)) {
-          line = line.trim();
+        if (trim(line).match(/^[|]{1}.*[|]{1}$/)) {
+          line = trim(line);
           tbl.push('<table>');
           hs = line.substring(1, line.length -1).split('|');
           tbl.push(tables.thead.apply(this, hs));
           line = lines[++i];
-          if (!line.trim().match(/^[|]{1}[-=| ]+[|]{1}$/)) {
+          if (!trim(line).match(/^[|]{1}[-=| ]+[|]{1}$/)) {
             // not a table rolling back
             line = lines[--i];
           }
           else {
             line = lines[++i];
             tbl.push('<tbody>');
-            while (line.trim().match(/^[|]{1}.*[|]{1}$/)) {
-              line = line.trim();
+            while (line.match(/^[|]{1}.*[|]{1}$/)) {
+              line = trim(line);
               tbl.push(tables.tr.apply(this, line.substring(1, line.length -1).split('|')));
               line = lines[++i];
             }
